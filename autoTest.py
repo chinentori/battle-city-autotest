@@ -263,7 +263,6 @@ def drawRuleScreen ():
                 main_loop = False
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    print ('here')
                     introScreen()
                     pygame.display.flip()
                     main_loop = False
@@ -281,7 +280,7 @@ def playerBugLog (player, player_index):
     for bullet in tanks.bullets:
         # bullet and castle
         if bullet.rect.colliderect(player.rect) and bullet.owner == bullet.OWNER_ENEMY:
-            logging.debug(currentTime + ' level'+ str(tanks.game.stage) + ':player' + str(player_index) + ' has been shot.')
+            logging.debug(currentTime + ' level'+ str(tanks.game.stage) + ':player' + str(player_index / 2 + 1) + ' has been shot.')
 
     # check if tanks get stuck
     playerStuckCheck(player, player_index)
@@ -308,14 +307,6 @@ def gameBugLog ():
 
     # enemy stuck check
     enemyStuckCheck()
-
-    # interaction check
-    interactionCheck()
-
-    # level finished
-    if len(tanks.game.level.enemies_left) == 0 and len(tanks.enemies) == 0:
-        logging.debug(currentTime + ' level' + str(tanks.game.stage) + ' completed')
-
     # check if player destroyed the castle
     for bullet in tanks.bullets:
         # bullet and castle
@@ -343,9 +334,16 @@ def gameBugLog ():
         enemyXY = [[0 for i in range(20)] for j in range(8)]
         playerStuck = [False] * 2
         enemyStuck = [False] * 4
-        logging.debug(currentTime + ' level' + str(tanks.game.stage + 1)  + ':Restart the game.')
+        logging.debug(currentTime + ' level' + str(tanks.game.stage + 1) + ':Restart the game.')
 
         time.sleep(3)
+
+    # interaction check
+    interactionCheck()
+
+    # level finished
+    # if len(tanks.game.level.enemies_left) == 0 and len(tanks.enemies) == 0:
+    #     logging.debug(currentTime + ' level' + str(tanks.game.stage) + ' completed')
 
 
 def interactionCheck():
@@ -465,15 +463,13 @@ def introScreen ():
 
 def runGame():
     # enter the game
-    currentTime = time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))
-    logging.debug(currentTime + ':Start from level ' + str(tanks.game.stage))
     tanks.game.nextLevel()
 
 
 def playerStuckCheck(player, player_index):
     # player stuck check
     global playerXY, playerStuck
-    rqm = time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))  # record current time
+    currentTime = time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))  # record current time
     second = int(time.strftime("%S", time.localtime()))
     if second % 3 == 0:
         index = second / 3 - 1
@@ -486,7 +482,7 @@ def playerStuckCheck(player, player_index):
             and abs(playerXY[player_index + 1][index - 1] - playerXY[player_index + 1][index - 2]) < 2 and not playerStuck [player_index / 2]:
                 playerStuck[player_index / 2] = True
                 # print ('player tank get stuck')
-                logging.debug(rqm + 'player tank get stuck')
+                logging.debug(currentTime + ' level'+ str(tanks.game.stage)  + ': player tank get stuck')
 
 
 def enemyStuckCheck():
@@ -508,7 +504,7 @@ def enemyStuckCheck():
                     enemyXY[index_enemy + 1][index - 1] - enemyXY[index_enemy + 1][index - 2]) < 2 and not enemyStuck[index_enemy / 2]:
                     enemyStuck[index_enemy / 2] = True
                     # print ('enemy tank get stuck')
-                    logging.debug(currentTime + 'enemy tank get stuck')
+                    logging.debug(currentTime + ' level'+ str(tanks.game.stage)  + ': enemy tank get stuck')
             index_enemy = index_enemy + 2
 
 
@@ -606,7 +602,7 @@ def varInitiate():
     tanks.bullets = []
     tanks.bonuses = []
     tanks.labels = []
-    tanks.play_sounds = False
+    tanks.play_sounds = True
     tanks.sounds = {}
     tanks.game = None
     tanks.castle = None
